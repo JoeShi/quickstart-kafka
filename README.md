@@ -31,3 +31,9 @@ server.3=172.31.102.42:2888:3888
 6. 登录一台 **Kafka** 实例，启动进程`sudo systemctl start kafka` ，并将 **Kafka** 设置成随机启动 `sudo systemctl enable kafka`
 7. 为其他两台 **Kafka** 执行相同操作
 
+
+## 安装 S3-Connect
+
+本文使用 S3-Connect 的 docker image 来实现，数据从 Kafka 导入 S3.
+
+

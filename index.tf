@@ -60,6 +60,32 @@ resource "aws_security_group" "zk_server" {
 }
 
 resource "aws_security_group" "kafka_server" {
+  name_prefix = "KafkaServer-"
+  ingress {
+    from_port = 22
+    protocol = "tcp"
+    to_port = 22
+    security_groups = ["${var.bastion_sg_id}"]
+  }
+
+  ingress {
+    from_port = 9092
+    protocol = "tcp"
+    to_port = 9092
+    security_groups = ["${aws_security_group.kafka_access.id}"]
+  }
+
+  egress {
+    from_port = 0
+    protocol = "-1"
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+resource "aws_security_group" "kafka_access" {
+  name_prefix = "KafkaAccess-"
   ingress {
     from_port = 22
     protocol = "tcp"

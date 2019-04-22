@@ -6,7 +6,6 @@ data "template_file" "kafka_userdata_1" {
     zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
     zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
   }
-  depends_on = ["aws_instance.zk_1", "aws_instance.zk_2", "aws_instance.zk_3"]
 }
 
 data "template_file" "kafka_userdata_2" {
@@ -17,7 +16,6 @@ data "template_file" "kafka_userdata_2" {
     zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
     zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
   }
-  depends_on = ["aws_instance.zk_1", "aws_instance.zk_2", "aws_instance.zk_3"]
 }
 
 data "template_file" "kafka_userdata_3" {
@@ -28,7 +26,6 @@ data "template_file" "kafka_userdata_3" {
     zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
     zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
   }
-  depends_on = ["aws_instance.zk_1", "aws_instance.zk_2", "aws_instance.zk_3"]
 }
 
 resource "aws_instance" "kafka_1" {
@@ -83,6 +80,9 @@ resource "aws_instance" "kafka_2" {
 
   user_data = "${data.template_file.kafka_userdata_2.rendered}"
   key_name = "${var.key}"
+  lifecycle {
+    ignore_changes = ["user_data"]
+  }
 }
 
 output "Kafka IP 2:" {
@@ -91,7 +91,7 @@ output "Kafka IP 2:" {
 
 resource "aws_instance" "kafka_3" {
   tags {
-    Name = "Kafka-2"
+    Name = "Kafka-3"
   }
   ami = "ami-085d69987e6675f08"
   instance_type = "m4.large"

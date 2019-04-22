@@ -85,7 +85,7 @@ resource "aws_instance" "zk_3" {
   }
   ami = "ami-085d69987e6675f08"
   instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_2}"
+  subnet_id = "${var.subnet_private_3}"
   vpc_security_group_ids = ["${aws_security_group.zk_server.id}"]
   root_block_device {
     volume_type = "gp2"
