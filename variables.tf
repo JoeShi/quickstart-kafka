@@ -26,3 +26,18 @@ variable "region" {
   default = "cn-northwest-1"
 }
 
+variable "bastion_host" {
+  default = "ec2-52-83-175-227.cn-northwest-1.compute.amazonaws.com.cn"
+}
+
+variable "bastion_username" {
+  default = "ec2-user"
+}
+
+variable "bastion_private_key" {
+  default = "~/.ssh/aws.pem"
+}
+
+variable "private_key" {
+  default = "~/.ssh/aws.pem"
+}
