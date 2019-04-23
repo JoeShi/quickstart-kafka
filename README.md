@@ -7,7 +7,7 @@ Kafka: 0.10.1
 
 ## 部署前提
 
-
+1. 本机已经安装 [Terraform](https://www.terraform.io/downloads.html)
 
 
 ## 安装步骤
@@ -23,7 +23,8 @@ terraform apply
 > 安装完成再执行以下操作
 
 3. 登录一台 **Zookeeper** 实例，修改 `/opt/zookeeper-3.4.6/conf/zoo.cfg`. 将文件
-中的IP地址改成 Zookeeper 的 **Private IP**.
+中的IP地址改成 Zookeeper 的 **Private IP**。 或者直接 `sudo cp /tmp/zoo.cfg /opt/zookeeper-3.4.6/conf/`.
+已经通过 terraform 自动生成配置文件.
 
 ```text
 server.1=172.31.100.52:2888:3888

@@ -7,16 +7,10 @@ variable "region" {
   default = "cn-northwest-1"
 }
 
-variable "subnet_private_1" {
-  default = "subnet-01960b79211596db0"
-}
-
-variable "subnet_private_2" {
-  default = "subnet-0c087c505790a067d"
-}
-
-variable "subnet_private_3" {
-  default = "subnet-0cdccbae920c4b603"
+# prefer private subnets for security reason
+variable "subnets" {
+  type = "list"
+  default = ["subnet-01960b79211596db0", "subnet-0c087c505790a067d", "subnet-0cdccbae920c4b603"]
 }
 
 variable "bastion_sg_id" {
@@ -57,7 +51,6 @@ variable "zk_count" {
 }
 
 variable "kafka_instance_type" {
-  type = "string"
   default = "m4.large"
 }
 
@@ -65,7 +58,6 @@ variable "kafka_instance_type" {
 variable "kafka_volume_size" {
   default = 500
 }
-
 
 variable "kafka_count" {
   default = 3

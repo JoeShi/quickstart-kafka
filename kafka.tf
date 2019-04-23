@@ -1,40 +1,21 @@
-data "template_file" "kafka_userdata_1" {
+data "template_file" "kafka_userdata" {
+  count = "${var.kafka_count}"
   template = "${file("${path.module}/scripts/kafka.tpl")}"
   vars {
-    broker_id = 1
-    zookeeper_1_ip = "${aws_instance.zk_1.private_ip}"
-    zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
-    zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
+    broker_id = "${count.index + 1}"
+    zooKeeperList = "${join(",", formatlist("%s:2181", aws_instance.zookeeper.*.private_ip))}"
   }
 }
 
-data "template_file" "kafka_userdata_2" {
-  template = "${file("${path.module}/scripts/kafka.tpl")}"
-  vars {
-    broker_id = 2
-    zookeeper_1_ip = "${aws_instance.zk_1.private_ip}"
-    zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
-    zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
-  }
-}
-
-data "template_file" "kafka_userdata_3" {
-  template = "${file("${path.module}/scripts/kafka.tpl")}"
-  vars {
-    broker_id = 3
-    zookeeper_1_ip = "${aws_instance.zk_1.private_ip}"
-    zookeeper_2_ip = "${aws_instance.zk_2.private_ip}"
-    zookeeper_3_ip = "${aws_instance.zk_3.private_ip}"
-  }
-}
-
-resource "aws_instance" "kafka_1" {
+resource "aws_instance" "kafka" {
+  count = "${var.kafka_count}"
   tags {
-    Name = "Kafka-1"
+    Name = "Kafka-${count.index + 1}"
+    Index = "${count.index + 1}"
   }
-  ami = "ami-085d69987e6675f08"
-  instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_1}"
+  ami = "${lookup(var.ami, var.region)}"
+  instance_type = "${var.kafka_instance_type}"
+  subnet_id = "${element(var.subnets, count.index)}"
   vpc_security_group_ids = ["${aws_security_group.zk_access.id}", "${aws_security_group.kafka_server.id}"]
   root_block_device {
     volume_type = "gp2"
@@ -45,75 +26,15 @@ resource "aws_instance" "kafka_1" {
   ebs_block_device {
     device_name = "/dev/xvdb"
     volume_type = "st1"
-    volume_size = 500
+    volume_size = "${var.kafka_volume_size}"
     delete_on_termination = true
   }
 
-  user_data = "${data.template_file.kafka_userdata_1.rendered}"
+  user_data = "${element(data.template_file.kafka_userdata.*.rendered, count.index)}"
   key_name = "${var.key}"
 }
 
-output "Kafka IP 1:" {
-  value = "${aws_instance.kafka_1.private_ip}"
+output "Kafka Private IPs:" {
+  value = "${join(",", aws_instance.kafka.*.private_ip)}"
 }
 
-resource "aws_instance" "kafka_2" {
-  tags {
-    Name = "Kafka-2"
-  }
-  ami = "ami-085d69987e6675f08"
-  instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_2}"
-  vpc_security_group_ids = ["${aws_security_group.zk_access.id}", "${aws_security_group.kafka_server.id}"]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = 10
-    delete_on_termination = true
-  }
-
-  ebs_block_device {
-    device_name = "/dev/xvdb"
-    volume_type = "st1"
-    volume_size = 500
-    delete_on_termination = true
-  }
-
-  user_data = "${data.template_file.kafka_userdata_2.rendered}"
-  key_name = "${var.key}"
-  lifecycle {
-    ignore_changes = ["user_data"]
-  }
-}
-
-output "Kafka IP 2:" {
-  value = "${aws_instance.kafka_2.private_ip}"
-}
-
-resource "aws_instance" "kafka_3" {
-  tags {
-    Name = "Kafka-3"
-  }
-  ami = "ami-085d69987e6675f08"
-  instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_3}"
-  vpc_security_group_ids = ["${aws_security_group.zk_access.id}", "${aws_security_group.kafka_server.id}"]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = 10
-    delete_on_termination = true
-  }
-
-  ebs_block_device {
-    device_name = "/dev/xvdb"
-    volume_type = "st1"
-    volume_size = 500
-    delete_on_termination = true
-  }
-
-  user_data = "${data.template_file.kafka_userdata_3.rendered}"
-  key_name = "${var.key}"
-}
-
-output "Kafka IP 3:" {
-  value = "${aws_instance.kafka_3.private_ip}"
-}

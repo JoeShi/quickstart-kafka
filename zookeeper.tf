@@ -1,92 +1,21 @@
-data "template_file" "zk_userdata_1" {
+data "template_file" "zk_userdata" {
+  count = "${var.zk_count}"
   template = "${file("${path.module}/scripts/zookeeper.tpl")}"
   vars {
-    index = 1
+    index = "${count.index + 1}"
   }
 }
 
-data "template_file" "zk_userdata_2" {
-  template = "${file("${path.module}/scripts/zookeeper.tpl")}"
-  vars {
-    index = 2
-  }
-}
-
-data "template_file" "zk_userdata_3" {
-  template = "${file("${path.module}/scripts/zookeeper.tpl")}"
-  vars {
-    index = 3
-  }
-}
-
-resource "aws_instance" "zk_1" {
+resource "aws_instance" "zookeeper" {
+  count = "${var.zk_count}"
   tags {
-    Name = "ZK-1"
+    Name = "ZK-${count.index + 1}"
+    Index = "${count.index + 1}"
   }
-  ami = "ami-085d69987e6675f08"
-  instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_1}"
-  vpc_security_group_ids = ["${aws_security_group.zk_server.id}"]
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = 10
-    delete_on_termination = true
-  }
-
-  ebs_block_device {
-    device_name = "/dev/xvdb"
-    volume_type = "gp2"
-    volume_size = 100
-    delete_on_termination = true
-  }
-
-  user_data = "${data.template_file.zk_userdata_1.rendered}"
-  key_name = "${var.key}"
-}
-
-output "ZK 1 IP:" {
-  value = "${aws_instance.zk_1.private_ip}"
-}
-
-resource "aws_instance" "zk_2" {
-  tags {
-    Name = "ZK-2"
-  }
-
-  ami = "ami-085d69987e6675f08"
-  instance_type = "m4.large"
-  subnet_id = "${var.subnet_private_2}"
-  vpc_security_group_ids = ["${aws_security_group.zk_server.id}"]
-  ebs_optimized = true
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = 10
-    delete_on_termination = true
-  }
-
-  ebs_block_device {
-    device_name = "/dev/xvdb"
-    volume_type = "gp2"
-    volume_size = 100
-    delete_on_termination = true
-  }
-  user_data = "${data.template_file.zk_userdata_2.rendered}"
-  key_name = "${var.key}"
-}
-
-output "ZK 2 IP:" {
-  value = "${aws_instance.zk_2.private_ip}"
-}
-
-resource "aws_instance" "zk_3" {
-  tags {
-    Name = "ZK-3"
-  }
-  ami = "ami-085d69987e6675f08"
+  ami = "${lookup(var.ami, var.region)}"
   instance_type = "${var.zk_instance_type}"
-  subnet_id = "${var.subnet_private_3}"
+  subnet_id = "${element(var.subnets, count.index)}"
   vpc_security_group_ids = ["${aws_security_group.zk_server.id}"]
-
   root_block_device {
     volume_type = "gp2"
     volume_size = 10
@@ -100,10 +29,39 @@ resource "aws_instance" "zk_3" {
     delete_on_termination = true
   }
 
-  user_data = "${data.template_file.zk_userdata_3.rendered}"
+  user_data = "${element(data.template_file.zk_userdata.*.rendered, count.index)}"
   key_name = "${var.key}"
 }
 
-output "ZK 3 IP:" {
-  value = "${aws_instance.zk_3.private_ip}"
+output "Zookeeper Private IPs" {
+  value = "${join(",", aws_instance.zookeeper.*.private_ip)}"
+}
+
+data "template_file" "zk_conf" {
+  template = "${file("${path.module}/scripts/zoo.cfg.tpl")}"
+  vars {
+    serverList = "${join("\n", formatlist("server.%s=%s:2888:3888", aws_instance.zookeeper.*.tags.Index , aws_instance.zookeeper.*.private_ip))}"
+  }
+}
+
+resource "null_resource" "zk_conf_upload" {
+  count = "${var.zk_count}"
+  triggers {
+    cluster_instance_ids = "${join(",", aws_instance.zookeeper.*.id)}"
+  }
+
+  provisioner "file" {
+    destination = "/tmp/zoo.cfg"
+    content = "${data.template_file.zk_conf.rendered}"
+  }
+
+  connection {
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("~/.ssh/aws.pem")}"
+    host = "${element(aws_instance.zookeeper.*.private_ip, count.index)}"
+    bastion_host = "${var.bastion_host}"
+    bastion_private_key = "${file("~/.ssh/aws.pem")}"
+    bastion_user = "${var.bastion_username}"
+  }
 }

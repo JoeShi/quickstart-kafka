@@ -1,3 +1,9 @@
+variable "ami" {
+  type = "map"
+  default = {
+    cn-northwest-1 = "ami-085d69987e6675f08"
+  }
+}
 
 provider "aws" {
   region = "cn-northwest-1"
