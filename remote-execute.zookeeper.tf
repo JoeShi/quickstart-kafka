@@ -60,10 +60,10 @@ resource "null_resource" "zk_2_remote" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    private_key = "${file("~/.ssh/aws.pem")}"
+    private_key = "${file(var.private_key)}"
     host = "${aws_instance.zk_2.private_ip}"
     bastion_host = "${var.bastion_host}"
-    bastion_private_key = "${file("~/.ssh/aws.pem")}"
+    bastion_private_key = "${file(var.bastion_private_key)}"
     bastion_user = "${var.bastion_username}"
   }
 }
@@ -81,10 +81,10 @@ resource "null_resource" "zk_3_remote" {
   connection {
     type = "ssh"
     user = "ubuntu"
-    private_key = "${file("~/.ssh/aws.pem")}"
+    private_key = "${file(var.private_key)}"
     host = "${aws_instance.zk_3.private_ip}"
     bastion_host = "${var.bastion_host}"
-    bastion_private_key = "${file("~/.ssh/aws.pem")}"
+    bastion_private_key = "${file(var.bastion_private_key)}"
     bastion_user = "${var.bastion_username}"
   }
 }

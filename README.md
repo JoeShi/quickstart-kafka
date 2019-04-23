@@ -5,6 +5,11 @@
 Zookeeper: 3.4.6
 Kafka: 0.10.1
 
+## 部署前提
+
+
+
+
 ## 安装步骤
 
 1. 修改 `variables.tf` 文件，如果选择是 private subnet, 请确保已经绑定 **NAT** 网关
@@ -37,3 +42,12 @@ server.3=172.31.102.42:2888:3888
 本文使用 S3-Connect 的 docker image 来实现，数据从 Kafka 导入 S3.
 
 
+
+## 测试命令
+
+```shell
+./kafka-topics.sh --zookeeper 172.31.100.90:2181,172.31.101.19:2181,172.31.101.183:2181 --create --topic s3connect --partitions 3 --replication-factor 2
+./kafka-topics.sh --zookeeper 172.31.100.90:2181,172.31.101.19:2181,172.31.101.183:2181 --describe --topic s3connect
+./kafka-console-producer.sh --broker-list 172.31.100.158:9092,172.31.101.37:9092,172.31.101.150:9092 --topic s3connect
+./kafka-console-consumer.sh --bootstrap-server 172.31.100.158:9092,172.31.101.37:9092,172.31.101.150:9092 --topic s3connect --from-beginning
+```
