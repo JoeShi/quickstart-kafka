@@ -16,7 +16,7 @@ resource "aws_instance" "kafka" {
   ami = "${lookup(var.ami, var.region)}"
   instance_type = "${var.kafka_instance_type}"
   subnet_id = "${element(var.subnets, count.index)}"
-  vpc_security_group_ids = ["${aws_security_group.zk_access.id}", "${aws_security_group.kafka_server.id}"]
+  vpc_security_group_ids = ["${aws_security_group.zk_kafka_cluster.id}"]
   root_block_device {
     volume_type = "gp2"
     volume_size = 10
@@ -34,7 +34,6 @@ resource "aws_instance" "kafka" {
   key_name = "${var.key}"
 }
 
-output "Kafka Private IPs:" {
-  value = "${join(",", aws_instance.kafka.*.private_ip)}"
+output "Kafka List:" {
+  value = "${join(",", formatlist("%s:9092", aws_instance.kafka.*.private_ip))}"
 }
-
