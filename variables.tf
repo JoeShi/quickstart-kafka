@@ -62,3 +62,7 @@ variable "kafka_volume_size" {
 variable "kafka_count" {
   default = 3
 }
+
+variable "build_s3_connect_image" {
+  default = false
+}
