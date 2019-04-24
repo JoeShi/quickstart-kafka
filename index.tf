@@ -1,78 +1,49 @@
+variable "ami" {
+  type = "map"
+  default = {
+    cn-northwest-1 = "ami-085d69987e6675f08"
+    cn-north-1 = "ami-013ead89472fc7464"
+  }
+}
 
 provider "aws" {
-  region = "cn-northwest-1"
-  profile = "zhy"
+  region = "${var.region}"
+  profile = "${var.profile}"
 }
 
-resource "aws_security_group" "zk_access" {
-  name_prefix = "ZookeeperAccess-"
-  egress {
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+resource "aws_security_group" "zk_kafka_cluster" {
+  name_prefix = "ZK-Kafka-Cluster-"
 
-resource "aws_security_group" "zk_server" {
-  name_prefix = "ZookeeperServer-"
-  ingress {
-    from_port = 2181
-    protocol = "tcp"
-    to_port = 2181
-    security_groups = ["${aws_security_group.zk_access.id}"]
-  }
-
+  # 允许来自堡垒机的访问
   ingress {
     from_port = 22
     protocol = "tcp"
     to_port = 22
-    security_groups = ["${var.bastion_sg_id}"]
+    cidr_blocks = ["${var.bastion_private_ip}/32"]
   }
 
+  # 允许集群内机器互相访问
   ingress {
-    from_port = 2888
-    protocol = "tcp"
-    to_port = 2888
+    from_port = 0
+    protocol = "-1"
+    to_port = 0
     self = true
   }
 
-  ingress {
-    from_port = 3888
-    protocol = "tcp"
-    to_port = 3888
-    self = true
-  }
-
+  # 允许来自 zk_kafka_access 安全组的机器访问 Zookeeper
   ingress {
     from_port = 2181
     protocol = "tcp"
     to_port = 2181
-    self = true
+    security_groups = ["${aws_security_group.zk_kafka_access.id}"]
   }
 
-  egress {
-    from_port = 0
-    protocol = "-1"
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "kafka_server" {
-  name_prefix = "KafkaServer-"
-  ingress {
-    from_port = 22
-    protocol = "tcp"
-    to_port = 22
-    security_groups = ["${var.bastion_sg_id}"]
-  }
-
+  # 允许来自 zk_kafka_access 安全组的机器访问 Kafka
   ingress {
     from_port = 9092
     protocol = "tcp"
     to_port = 9092
-    security_groups = ["${aws_security_group.kafka_access.id}"]
+    security_groups = ["${aws_security_group.zk_kafka_access.id}"]
   }
 
   egress {
@@ -81,16 +52,18 @@ resource "aws_security_group" "kafka_server" {
     to_port = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+
 }
 
+# 为资源添加 Kafka-Access- 开头的安全组即可访问 Kafka 和 Zookeeper 集群
+resource "aws_security_group" "zk_kafka_access" {
+  name_prefix = "Kafka-Access-"
 
-resource "aws_security_group" "kafka_access" {
-  name_prefix = "KafkaAccess-"
   ingress {
     from_port = 22
     protocol = "tcp"
     to_port = 22
-    security_groups = ["${var.bastion_sg_id}"]
+    cidr_blocks = ["${var.bastion_private_ip}/32"]
   }
 
   egress {
@@ -99,4 +72,9 @@ resource "aws_security_group" "kafka_access" {
     to_port = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+}
+
+output "Kafka Access Security Group Id:" {
+  value = "${aws_security_group.zk_kafka_access.id}"
 }

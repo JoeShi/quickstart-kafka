@@ -53,6 +53,7 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "s3_connect_profile" {
+  name_prefix = "S3-Connect-"
   role = "${aws_iam_role.s3_connect.name}"
 }
 
