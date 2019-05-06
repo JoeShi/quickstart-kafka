@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Update, install Java, EBS init
-apt-get update -y
-apt-get install default-jre -y
+yum update -y
+yum install java -y
 mkfs -t xfs /dev/xvdb
 mkdir /data
 mount /dev/xvdb /data
@@ -10,10 +10,10 @@ echo "/dev/xvdb /data  xfs  defaults,nofail  0  2" >> /etc/fstab
 
 # Install Kafka
 cd /opt
-curl "https://s3.cn-northwest-1.amazonaws.com.cn/aws-quickstart/apache/kafka/kafka_2.11-0.10.1.0.tgz" -o /tmp/kafka.tgz
+curl "https://s3.cn-northwest-1.amazonaws.com.cn/aws-quickstart/mirror/apache/kafka/kafka_2.11-0.10.1.0.tgz" -o /tmp/kafka.tgz
 mkdir /opt/kafka
 cd /opt/kafka
-tar -xvzf /tmp/kafka.tgz --strip 1
+tar -xzf /tmp/kafka.tgz --strip 1
 
 cat > /opt/kafka/config/server.properties <<EOF
 # Licensed to the Apache Software Foundation (ASF) under one or more

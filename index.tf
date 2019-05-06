@@ -1,8 +1,8 @@
 variable "ami" {
   type = "map"
   default = {
-    cn-northwest-1 = "ami-085d69987e6675f08"
-    cn-north-1 = "ami-013ead89472fc7464"
+    cn-northwest-1 = "ami-094b7433620966eb5"
+    cn-north-1 = "ami-0cad3dea07a7c36f9"
   }
 }
 

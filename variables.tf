@@ -1,9 +1,9 @@
-# public key name of Instance, do NOT include .pem
+# public key name of Zookeer and Kafka Instances, do NOT include .pem
 variable "key" {
   default = "aws"
 }
 
-# support cn-northwest-1, cn-north-1
+# ONLY support cn-northwest-1, cn-north-1 regions
 variable "region" {
   default = "cn-northwest-1"
 }
@@ -19,7 +19,7 @@ variable "subnets" {
   default = ["subnet-01960b79211596db0", "subnet-0c087c505790a067d", "subnet-0cdccbae920c4b603"]
 }
 
-# private IP of bastion machine. All
+# private IP of bastion machine.
 variable "bastion_private_ip" {
   default = "172.31.38.158"
 }
@@ -36,6 +36,7 @@ variable "bastion_username" {
   default = "ec2-user"
 }
 
+# private key path for bastion machine
 variable "bastion_private_key" {
   default = "~/.ssh/aws.pem"
 }
