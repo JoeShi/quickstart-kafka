@@ -1,22 +1,23 @@
 #!/bin/bash
 
-apt-get update -y
-apt-get install default-jre -y
+yum update -y
+yum install java -y
 mkfs -t xfs /dev/xvdb
 mkdir /data
 mount /dev/xvdb /data
 echo "/dev/xvdb /data  xfs  defaults,nofail  0  2" >> /etc/fstab  # automatically mount ebs
 
 cd /opt
-wget https://s3.cn-northwest-1.amazonaws.com.cn/aws-quickstart/apache/zookeeper/zookeeper-3.4.6.tar.gz
-tar zxvf zookeeper-3.4.6.tar.gz
-rm -rf zookeeper-3.4.6.tar.gz
+curl "https://s3.cn-northwest-1.amazonaws.com.cn/aws-quickstart/mirror/apache/zookeeper/zookeeper-3.4.6.tar.gz" -o /tmp/zookeeper.tgz
+mkdir /opt/zookeeper
+cd /opt/zookeeper
+tar -xzf /tmp/zookeeper.tgz --strip 1
 
 mkdir -p /data/zookeeper
 touch /data/zookeeper/myid
 echo "${index}" >> /data/zookeeper/myid
 
-cat > /opt/zookeeper-3.4.6/conf/zoo.cfg <<EOF
+cat > /opt/zookeeper/conf/zoo.cfg <<EOF
 tickTime=2000
 initLimit=5
 syncLimit=2
@@ -34,11 +35,11 @@ Wants=syslog.target
 
 [Service]
 Type=forking
-WorkingDirectory=/opt/zookeeper-3.4.6/bin
+WorkingDirectory=/opt/zookeeper/bin
 User=root
-ExecStart=/opt/zookeeper-3.4.6/bin/zkServer.sh start
-ExecStop=/opt/zookeeper-3.4.6/bin/zkServer.sh stop
-ExecReload=/opt/zookeeper-3.4.6/bin/zkServer.sh restart
+ExecStart=/opt/zookeeper/bin/zkServer.sh start
+ExecStop=/opt/zookeeper/bin/zkServer.sh stop
+ExecReload=/opt/zookeeper/bin/zkServer.sh restart
 TimeoutSec=30
 Restart=on-failure
 

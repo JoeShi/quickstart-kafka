@@ -53,7 +53,7 @@ resource "null_resource" "zk_conf_upload" {
 
   connection {
     type = "ssh"
-    user = "ubuntu"
+    user = "ec2-user"
     private_key = "${file(var.private_key)}"
     host = "${element(aws_instance.zookeeper.*.private_ip, count.index)}"
     bastion_host = "${var.bastion_public_host}"

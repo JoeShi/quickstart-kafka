@@ -36,10 +36,10 @@ terraform apply
 3. 登录一台 **Zookeeper** 实例，将生成的配置文件拷贝到 zookeeper 目录下
 
 ```shell
-sudo cp /tmp/zoo.cfg /opt/zookeeper-3.4.6/conf/
+sudo cp /tmp/zoo.cfg /opt/zookeeper/conf/
 ```
 
-或者修改 `/opt/zookeeper-3.4.6/conf/zoo.cfg`. 将文件
+或者修改 `/opt/zookeeper/conf/zoo.cfg`. 将文件
 中的IP地址改成 Zookeeper 的 **Private IP**, 如:
 
 ```text
