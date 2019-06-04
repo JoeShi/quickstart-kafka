@@ -109,3 +109,44 @@ sudo systemctl enable kafka
 **测试用 message**
 {"value": "New", "onclick": "CreateNewDoc"}
 {alignment": "center"}
+
+
+```shell
+./kafka-avro-console-producer \
+--broker-list 172.31.100.222:9092,172.31.101.32:9092,172.31.102.198:9092 --topic s3connect4 \
+--property value.schema="$(jq -r tostring /tmp/s3-connect/schema.avsc)"
+```
+
+```shell
+./bin/kafka-avro-console-producer \
+--broker-list 127.0.0.1:9092 --topic s3connect4 \
+--property value.schema="$(jq -r tostring /tmp/s3-connect/schema.avsc)"
+```
+
+
+## Start Docker container
+
+```shell
+docker run -d \
+  --name=kafka-connect \
+  --net=host \
+  -e CONNECT_BOOTSTRAP_SERVERS=localhost:29092 \
+  -e CONNECT_REST_PORT=28082 \
+  -e CONNECT_GROUP_ID="quickstart" \
+  -e CONNECT_CONFIG_STORAGE_TOPIC="quickstart-config" \
+  -e CONNECT_OFFSET_STORAGE_TOPIC="quickstart-offsets" \
+  -e CONNECT_STATUS_STORAGE_TOPIC="quickstart-status" \
+  -e CONNECT_KEY_CONVERTER="org.apache.kafka.connect.json.JsonConverter" \
+  -e CONNECT_VALUE_CONVERTER="org.apache.kafka.connect.json.JsonConverter" \
+  -e CONNECT_INTERNAL_KEY_CONVERTER="org.apache.kafka.connect.json.JsonConverter" \
+  -e CONNECT_INTERNAL_VALUE_CONVERTER="org.apache.kafka.connect.json.JsonConverter" \
+  -e CONNECT_REST_ADVERTISED_HOST_NAME="localhost" \
+  -e CONNECT_PLUGIN_PATH=/usr/share/java \
+  confluentinc/cp-kafka-connect:5.2.1
+```
+
+
+## Appendix
+
+[Encode Error](https://stackoverflow.com/questions/50372884/kafka-s3-connect-value-is-not-struct-type-error)
+[Pushing AVRO to Kafka](https://stackoverflow.com/questions/51664191/pushing-avro-file-to-kafka)

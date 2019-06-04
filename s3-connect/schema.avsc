@@ -1,0 +1,63 @@
+{
+    "type": "record",
+    "name": "DataRecord",
+    "fields": [
+        {
+            "name": "activeDate",
+            "type": "string"
+        },
+        {
+            "name": "activeHour",
+            "type": "string"
+        },
+        {
+            "name": "data",
+            "type": {
+                "type": "map",
+                "values": {
+                    "type": "record",
+                    "name": "PayloadRecord",
+                    "fields": [
+                        {
+                            "name": "wm_order_id",
+                            "type": "int"
+                        },
+                        {
+                            "name": "wm_order_id_view_str",
+                            "type": "string"
+                        },
+                        {
+                            "name": "wm_poi_id",
+                            "type": "int"
+                        },
+                        {
+                            "name": "print_cnt",
+                            "type": "int"
+                        },
+                        {
+                            "name": "city_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "city_id",
+                            "type": "int"
+                        },
+                        {
+                            "name": "cancel_reason",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "code",
+            "type": "int"
+        },
+        {
+            "name": "msg",
+            "type": "string"
+        }
+    ]
+}
+

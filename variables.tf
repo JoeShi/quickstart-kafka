@@ -24,6 +24,7 @@ variable "bastion_private_ip" {
   default = "172.31.38.158"
 }
 
+# S3 Bucket for kafka S3 Connect, please create manually first
 variable "s3_connect_bucket" {
   default = "s3-connect"
 }
