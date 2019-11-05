@@ -1,14 +1,14 @@
 variable "ami" {
   type = "map"
   default = {
-    cn-northwest-1 = "ami-094b7433620966eb5"
+    cn-northwest-1 = "ami-0b559eb60740a96b4"
     cn-north-1 = "ami-0cad3dea07a7c36f9"
   }
 }
 
 provider "aws" {
-  region = "${var.region}"
-  profile = "${var.profile}"
+  region = var.region
+#  profile = var.profile # uncomment this line if not using the default
 }
 
 resource "aws_security_group" "zk_kafka_cluster" {
@@ -35,7 +35,8 @@ resource "aws_security_group" "zk_kafka_cluster" {
     from_port = 2181
     protocol = "tcp"
     to_port = 2181
-    security_groups = ["${aws_security_group.zk_kafka_access.id}"]
+    security_groups = [
+      aws_security_group.zk_kafka_access.id]
   }
 
   # 允许来自 zk_kafka_access 安全组的机器访问 Kafka
@@ -43,7 +44,8 @@ resource "aws_security_group" "zk_kafka_cluster" {
     from_port = 9092
     protocol = "tcp"
     to_port = 9092
-    security_groups = ["${aws_security_group.zk_kafka_access.id}"]
+    security_groups = [
+      aws_security_group.zk_kafka_access.id]
   }
 
   egress {
@@ -75,6 +77,6 @@ resource "aws_security_group" "zk_kafka_access" {
 
 }
 
-output "Kafka Access Security Group Id:" {
-  value = "${aws_security_group.zk_kafka_access.id}"
+output "Kafka_Access_Security_Group_Id" {
+  value = aws_security_group.zk_kafka_access.id
 }

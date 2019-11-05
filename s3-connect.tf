@@ -1,5 +1,5 @@
 data "aws_s3_bucket" "s3_connect" {
-  bucket = "${var.s3_connect_bucket}"
+  bucket = var.s3_connect_bucket
 }
 
 resource "aws_iam_role" "s3_connect" {
@@ -49,14 +49,14 @@ resource "aws_iam_role_policy" "s3_readwrite" {
     ]
 }
 EOF
-  role = "${aws_iam_role.s3_connect.id}"
+  role = aws_iam_role.s3_connect.id
 }
 
 resource "aws_iam_instance_profile" "s3_connect_profile" {
   name_prefix = "S3-Connect-"
-  role = "${aws_iam_role.s3_connect.name}"
+  role = aws_iam_role.s3_connect.name
 }
 
-output "S3-Connect Worker IAM Role" {
-  value = "${aws_iam_role.s3_connect.name}"
+output "S3_Connect_Worker_IAM_Role" {
+  value = aws_iam_role.s3_connect.name
 }

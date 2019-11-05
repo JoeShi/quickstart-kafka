@@ -2,7 +2,7 @@
 
 # Update, install Java, EBS init
 yum update -y
-yum install java -y
+yum install java-1.8.0-amazon-corretto
 mkfs -t xfs /dev/xvdb
 mkdir /data
 mount /dev/xvdb /data
