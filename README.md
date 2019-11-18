@@ -107,5 +107,8 @@ sudo systemctl enable kafka
 ```
 
 **测试用 message**
+```shell script
 {"value": "New", "onclick": "CreateNewDoc"}
 {alignment": "center"}
+```
+
