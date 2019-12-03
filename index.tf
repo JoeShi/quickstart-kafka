@@ -11,8 +11,11 @@ provider "aws" {
 #  profile = var.profile # uncomment this line if not using the default
 }
 
+resource "aws_default_vpc" "default" {}
+
 resource "aws_security_group" "zk_kafka_cluster" {
   name_prefix = "ZK-Kafka-Cluster-"
+  vpc_id      = aws_default_vpc.default.id
 
   # 允许来自堡垒机的访问
   ingress {
@@ -60,6 +63,7 @@ resource "aws_security_group" "zk_kafka_cluster" {
 # 为资源添加 Kafka-Access- 开头的安全组即可访问 Kafka 和 Zookeeper 集群
 resource "aws_security_group" "zk_kafka_access" {
   name_prefix = "Kafka-Access-"
+  vpc_id      = aws_default_vpc.default.id
 
   ingress {
     from_port = 22
