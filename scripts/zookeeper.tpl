@@ -1,7 +1,7 @@
 #!/bin/bash
 
 yum update -y
-yum install java-1.8.0-amazon-corretto
+yum install -y java-1.8.0-devel
 mkfs -t xfs /dev/xvdb
 mkdir /data
 mount /dev/xvdb /data

@@ -25,6 +25,15 @@ Kafka: 0.10.1
 
 1. 根据 `variables.tf` 文件 ``修改 ，如果选择是 private subnet, 请确保已经绑定 **NAT** 网关
 
+> Terraform 会在默认 VPC 中创建所有资源，若您希望在自己创建的非默认 VPC 中创建该集群，请按照以下步骤更改 Terraform 的默认 VPC 状态:
+
+> 若您之前执行过该 Terraform 脚本 (目录下存在 .tfstate 文件)，请先删除 aws_default_vpc state, 再导入状态；若不存在文件，请直接执行第二条指令:
+
+```bash
+terraform state rm aws_default_vpc.default
+terraform import aws_default_vpc.default <vpc-id>
+```
+
 2. 执行 **Terraform** 脚本
 ```bash
 terraform init
